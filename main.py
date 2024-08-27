@@ -1,37 +1,98 @@
 import pyglet
+import random
 from pyglet.window import key
 from pyglet import shapes
-import random
+from random import randint
 import pygetwindow as wp
-import keyboard as ky
+from platforms import Platform
 
-x = 0
+x = 500
 y = 0
 velX = 0
 velY = 0
-
-running = True
-MainWindow = pyglet.window.Window(width=100,height=100,caption='PLAYER')
-SecondWindow = pyglet.window.Window(width=100,height=100,caption='PLAYER')
-
-playerWindow = wp.getWindowsWithTitle('PLAYER')[0]
-secondWindow = wp.getWindowsWithTitle('PLAYER')[1]
+grounded = False
+floorHeight = 850
+Gravity = 1
 
 def UPDATE():
-    global x, y, velX, velY
+    global x, y, velX, velY,Gravity,grounded
+
+    if y >= floorHeight:
+        y = floorHeight
+        grounded = True
+    else: grounded = False
+
+    if grounded == False:
+        velY += Gravity
+
     x += velX
     y += velY
 
-while running:
-    playerWindow.moveTo(int(x + 100),int(y))
-    secondWindow.moveTo(-x,y)
-    UPDATE()
-    if ky.is_pressed('d'):
-        velX = 1
 
-    if ky.is_pressed('a'):
-        velX = -1
+    if x + 100 > myPlatform.x and x < myPlatform.x + myPlatform.width:
+        if y + 100 > myPlatform.y and y < myPlatform.y + myPlatform.height:
+            print("Collision detected2")
 
-    if ky.is_pressed('f'):
-        running = False
     
+    playerWindow.moveTo(int(x + 500),int(y))
+    
+
+running = True
+
+MainWindow = pyglet.window.Window(width=100,height=100,caption='PLAYER')
+background = pyglet.shapes.Rectangle(0,0,100,100,color=(255,0,0))
+
+#PLATFORMS
+
+myPlatform = Platform(200,100,500,100)
+
+myPlatform.update()
+
+
+@MainWindow.event
+def on_draw():
+    MainWindow.clear()
+    background.draw()
+    UPDATE()
+
+
+
+@MainWindow.event
+def on_key_press(symbol,modifier):
+    global velX, velY, x, y,running,grounded
+    if symbol == key.A:
+        print("AA")
+        velX = -10
+        
+    elif symbol == key.D:
+        print("DD")
+        velX = 10
+
+
+    elif symbol == key.W and grounded == True:
+        print("WW")
+        velY += -50
+        grounded = False
+
+    elif symbol == key.F:
+        MainWindow.close()
+
+
+
+@MainWindow.event
+def on_key_release(symbol,modifier):
+    global velX, velY, x, y,running
+    if symbol == key.A or symbol == key.D:
+        velX = 0
+        
+
+    elif symbol == key.S or symbol == key.W:
+        velY = 0
+
+        
+        
+playerWindow = wp.getWindowsWithTitle('PLAYER')[0]
+
+while running:
+    pyglet.app.run()
+
