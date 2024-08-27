@@ -29,11 +29,11 @@ def UPDATE():
     y += velY
 
 
-    if x + 100 > myPlatform.x and x < myPlatform.x + myPlatform.width:
+    if x + 500> myPlatform.x and x < myPlatform.x + myPlatform.width - 500: #GAMBIARRA
         if y + 100 > myPlatform.y and y < myPlatform.y + myPlatform.height:
-            print("Collision detected2")
+            print("collison")
 
-    
+    windowPlatform.moveTo(myPlatform.x,myPlatform.y)
     playerWindow.moveTo(int(x + 500),int(y))
     
 
@@ -47,6 +47,7 @@ background = pyglet.shapes.Rectangle(0,0,100,100,color=(255,0,0))
 myPlatform = Platform(200,100,500,100)
 
 myPlatform.update()
+windowPlatform = wp.getWindowsWithTitle("PLATFORM")[0]
 
 
 @MainWindow.event
