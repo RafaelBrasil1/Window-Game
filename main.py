@@ -5,6 +5,7 @@ from pyglet import shapes
 from random import randint
 import pygetwindow as wp
 from platforms import Platform
+import pyautogui
 
 x = 500
 y = 0
@@ -12,18 +13,19 @@ velX = 0
 velY = 0
 grounded = False
 floorHeight = 850
-Gravity = 1
+Gravity = 2
+onPlatform = False
 
+platformesList = []
 
 def UPDATE():
-    global x, y, velX, velY,Gravity,grounded,floorHeight
+    global x, y, velX, velY,Gravity,grounded,floorHeight,onPlatform
     
     if y >= floorHeight:
         velY = 0
         grounded = True
     else: grounded = False
 
-    print(grounded)
 
     if grounded == False:
         velY += Gravity
@@ -33,14 +35,27 @@ def UPDATE():
 
     
 
-
-    if x + 600 > myPlatform.x and x < myPlatform.x + myPlatform.width - 500: #GAMBIARRA
-        if y < myPlatform.y + myPlatform.height:
-            floorHeight = myPlatform.y - myPlatform.height
-    else: floorHeight = 850
+    floorHeight = 850
+    #PLATFORMS
+    platformWindowlist = wp.getWindowsWithTitle("PLATFORM")
+    for i in range(len(platformesList)):
+        platformesList[i].update()
+        
+        if x + 600 > platformesList[i].x and x < platformesList[i].x + platformesList[i].width - 500: #GAMBIARRA
+            if y < platformesList[i].y + platformesList[i].height:
+                floorHeight = platformesList[i].y - platformesList[i].height
+                onPlatform = True
+        else: onPlatform = False
         
 
-    windowPlatform.moveTo(myPlatform.x,myPlatform.y)
+        platformWindowlist[i].moveTo(platformesList[i].x,platformesList[i].y)
+        
+
+    
+
+        
+
+    
     playerWindow.moveTo(int(x + 500),int(y))
     
 
@@ -49,12 +64,6 @@ running = True
 MainWindow = pyglet.window.Window(width=100,height=100,caption='PLAYER')
 background = pyglet.shapes.Rectangle(0,0,100,100,color=(255,0,0))
 
-#PLATFORMS
-
-myPlatform = Platform(600,600,500,100)
-
-myPlatform.update()
-windowPlatform = wp.getWindowsWithTitle("PLATFORM")[0]
 
 
 @MainWindow.event
@@ -67,18 +76,15 @@ def on_draw():
 
 @MainWindow.event
 def on_key_press(symbol,modifier):
-    global velX, velY, x, y,running,grounded,Jumped
+    global velX, velY, x, y,running,grounded,Jumped,Gravity
     if symbol == key.A:
-        print("AA")
         velX = -10
         
     elif symbol == key.D:
-        print("DD")
         velX = 10
 
 
     elif symbol == key.W and grounded == True:
-        print("WW")
         y -= 50
         velY = -40
         Jumped = True
@@ -86,6 +92,17 @@ def on_key_press(symbol,modifier):
 
     elif symbol == key.F:
         MainWindow.close()
+
+    elif symbol == key.R:
+        if len(platformesList) == 0:
+            platformesList.append(Platform(pyautogui.position().x - 250,pyautogui.position().y,500,100))
+
+        else:
+            platformesList[0].GameWindow.close()
+            platformesList[0] = Platform(pyautogui.position().x - 250,pyautogui.position().y,500,100)
+
+        
+
 
 
 
