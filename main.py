@@ -14,13 +14,16 @@ grounded = False
 floorHeight = 850
 Gravity = 1
 
-def UPDATE():
-    global x, y, velX, velY,Gravity,grounded
 
+def UPDATE():
+    global x, y, velX, velY,Gravity,grounded,floorHeight
+    
     if y >= floorHeight:
-        y = floorHeight
+        velY = 0
         grounded = True
     else: grounded = False
+
+    print(grounded)
 
     if grounded == False:
         velY += Gravity
@@ -28,10 +31,14 @@ def UPDATE():
     x += velX
     y += velY
 
+    
 
-    if x + 500> myPlatform.x and x < myPlatform.x + myPlatform.width - 500: #GAMBIARRA
-        if y + 100 > myPlatform.y and y < myPlatform.y + myPlatform.height:
-            print("collison")
+
+    if x + 600 > myPlatform.x and x < myPlatform.x + myPlatform.width - 500: #GAMBIARRA
+        if y < myPlatform.y + myPlatform.height:
+            floorHeight = myPlatform.y - myPlatform.height
+    else: floorHeight = 850
+        
 
     windowPlatform.moveTo(myPlatform.x,myPlatform.y)
     playerWindow.moveTo(int(x + 500),int(y))
@@ -44,7 +51,7 @@ background = pyglet.shapes.Rectangle(0,0,100,100,color=(255,0,0))
 
 #PLATFORMS
 
-myPlatform = Platform(200,100,500,100)
+myPlatform = Platform(600,600,500,100)
 
 myPlatform.update()
 windowPlatform = wp.getWindowsWithTitle("PLATFORM")[0]
@@ -60,7 +67,7 @@ def on_draw():
 
 @MainWindow.event
 def on_key_press(symbol,modifier):
-    global velX, velY, x, y,running,grounded
+    global velX, velY, x, y,running,grounded,Jumped
     if symbol == key.A:
         print("AA")
         velX = -10
@@ -72,7 +79,9 @@ def on_key_press(symbol,modifier):
 
     elif symbol == key.W and grounded == True:
         print("WW")
-        velY += -50
+        y -= 50
+        velY = -40
+        Jumped = True
         grounded = False
 
     elif symbol == key.F:
@@ -87,8 +96,6 @@ def on_key_release(symbol,modifier):
         velX = 0
         
 
-    elif symbol == key.S or symbol == key.W:
-        velY = 0
 
         
         
