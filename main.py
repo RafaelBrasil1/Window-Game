@@ -38,6 +38,7 @@ if menu == True:
         menu = False
         PlayWindow.close()
         HowToPlayWindow.close()
+        Info.close()
         Game()
 
     HowToPlayWindow = pyglet.window.Window(width=300,height=100,caption='HOW TO PLAY')
