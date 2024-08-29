@@ -6,6 +6,7 @@ from random import randint
 import pygetwindow as wp
 from platforms import Platform
 import pyautogui
+import time
 
 x = 500
 y = 0
@@ -15,11 +16,30 @@ grounded = False
 floorHeight = 850
 Gravity = 2
 onPlatform = False
+fallingSpeed = 1
+score = 0
+scoreTime_start = time.time()
+scoreTime_end = time.time()
 
-platformesList = []
+scoreWindow = pyglet.window.Window(width=300,height=100,caption='SCORE')
+scoreLabel = pyglet.text.Label('Score: '+str(score), font_name='Times New Roman', font_size=24, x=scoreWindow.width//2, y=scoreWindow.height//2,anchor_x='center', anchor_y='center')
+@scoreWindow.event
+def on_draw():
+    global score,scoreTime_start,scoreTime_end
+    scoreWindow.clear()
+    scoreLabel.draw()
+    scoreTime_end = time.time()
+    if scoreTime_end - scoreTime_start >= 1:
+        scoreTime_start = time.time()
+        score += 1
+    
+
+            
+
+platformesList = [Platform(x + 250,y + 500,500,100)]
 
 def UPDATE():
-    global x, y, velX, velY,Gravity,grounded,floorHeight,onPlatform
+    global x, y, velX, velY,Gravity,grounded,floorHeight,onPlatform,fallingSpeed
     
     if y >= floorHeight:
         velY = 0
@@ -33,6 +53,10 @@ def UPDATE():
     x += velX
     y += velY
 
+    if y > 850:
+        MainWindow.close()
+        for platforms in platformesList:
+            platforms.GameWindow.close()
     
 
     floorHeight = 850
@@ -49,6 +73,8 @@ def UPDATE():
         
 
         platformWindowlist[i].moveTo(platformesList[i].x,platformesList[i].y)
+        platformesList[i].y += int(fallingSpeed)
+        fallingSpeed += 0.01
         
 
     
@@ -89,9 +115,6 @@ def on_key_press(symbol,modifier):
         velY = -40
         Jumped = True
         grounded = False
-
-    elif symbol == key.F:
-        MainWindow.close()
 
     elif symbol == key.R:
         if len(platformesList) == 0:
