@@ -1,3 +1,5 @@
+from pickle import FALSE
+from re import T
 from tkinter.ttk import Style
 import pyglet
 import random
@@ -20,6 +22,7 @@ onPlatform = False
 fallingSpeed = 1
 menu = True
 running = True
+Closed = False
 
 if menu == True:
     PlayWindow = pyglet.window.Window(width=300,height=100,caption='PLAY')
@@ -82,56 +85,66 @@ if menu == True:
         PlayWindow.set_visible(False)
 
 
-
-def Game():                
+def Game():
 
     platformesList = [Platform(x + 250,y + 500,500,100)]
 
     def UPDATE():
-        global x, y, velX, velY,Gravity,grounded,floorHeight,onPlatform,fallingSpeed
-        
-        if y >= floorHeight:
-            velY = 0
-            grounded = True
-        else: grounded = False
-
-
-        if grounded == False:
-            velY += Gravity
-
-        x += velX
-        y += velY
-
-        if y > 850:
-            MainWindow.close()
-            for platforms in platformesList:
-                platforms.GameWindow.close()
-        
-
-        floorHeight = 850
-        #PLATFORMS
-        platformWindowlist = wp.getWindowsWithTitle("PLATFORM")
-        for i in range(len(platformesList)):
-            platformesList[i].update()
+        global x, y, velX, velY,Gravity,grounded,floorHeight,onPlatform,fallingSpeed,running,Closed
+        if running == True:
             
-            if x + 600 > platformesList[i].x and x < platformesList[i].x + platformesList[i].width - 500: #GAMBIARRA
-                if y < platformesList[i].y + platformesList[i].height:
-                    floorHeight = platformesList[i].y - platformesList[i].height
-                    onPlatform = True
-            else: onPlatform = False
+            if y >= floorHeight:
+                velY = 0
+                grounded = True
+            else: grounded = False
+
+
+            if grounded == False:
+                velY += Gravity
+
+            x += velX
+            y += velY
+
+            if y > 850:
+                Closed = True
+                MainWindow.close()
+                platformesList[0].GameWindow.close()
+                pyglet.app.event_loop.run()
+                
+                
+            
+                
+                
+                
+                
+                    
+                
             
 
-            platformWindowlist[i].moveTo(platformesList[i].x,platformesList[i].y)
-            platformesList[i].y += int(fallingSpeed)
-            fallingSpeed += 0.01
+            floorHeight = 850
+            #PLATFORMS
+            platformWindowlist = wp.getWindowsWithTitle("PLATFORM")
+            for i in range(len(platformesList)):
+                platformesList[i].update()
+                
+                if x + 600 > platformesList[i].x and x < platformesList[i].x + platformesList[i].width - 500: #GAMBIARRA
+                    if y < platformesList[i].y + platformesList[i].height:
+                        floorHeight = platformesList[i].y - platformesList[i].height
+                        onPlatform = True
+                else: onPlatform = False
+                
+
+                platformWindowlist[i].moveTo(platformesList[i].x,platformesList[i].y)
+                platformesList[i].y += int(fallingSpeed)
+                fallingSpeed += 0.01
+                    
+
             
 
-        
+                
 
-            
-
-        
-        playerWindow.moveTo(int(x + 500),int(y))
+                if Closed == False:
+                    playerWindow.moveTo(int(x + 500),int(y))
         
 
     
@@ -143,9 +156,11 @@ def Game():
 
     @MainWindow.event
     def on_draw():
-        MainWindow.clear()
-        background.draw()
-        UPDATE()
+        if Closed == False:
+            MainWindow.clear()
+            background.draw()
+            UPDATE()
+            
 
 
 
@@ -184,12 +199,10 @@ def Game():
         if symbol == key.A or symbol == key.D:
             velX = 0
             
-
-
-            
-            
     playerWindow = wp.getWindowsWithTitle('PLAYER')[0]
 
+    
+
+            
 while running:
     pyglet.app.run()
-
